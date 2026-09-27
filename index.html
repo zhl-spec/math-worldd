@@ -51,6 +51,7 @@
         label {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             font-weight: bold;
             margin-bottom: 5px;
         }
@@ -82,7 +83,7 @@
         }
 
         .btn:hover { transform: scale(1.02); }
-        .btn-battle { background: linear-gradient(45deg, #FF4757, #FF6B81); }
+        .btn-battle { background: linear-gradient(45deg, #FF4757, #FF6B81); font-size: 18px; }
         .btn-reveal { background: linear-gradient(45deg, #FFA502, #ECCC68); color: #12131C; }
 
         .team-container {
@@ -124,62 +125,137 @@
         .pro { background: rgba(46, 213, 115, 0.2); border-left: 4px solid var(--success); }
         .con { background: rgba(255, 165, 2, 0.2); border-left: 4px solid var(--warning); }
 
-        /* Battle Arena Styling */
+        /* CARTOON BATTLE ARENA STYLING */
         .arena-box {
             margin-top: 20px;
-            background: rgba(0,0,0,0.4);
-            border-radius: 10px;
-            padding: 15px;
+            background: #181A26;
+            border: 2px dashed #3D425E;
+            border-radius: 12px;
+            padding: 20px;
             text-align: center;
             display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brawler-stage {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .team-brawlers {
+            display: flex;
+            gap: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .brawler-avatar {
+            font-size: 38px;
+            background: rgba(255,255,255,0.1);
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+
+        .clash-center {
+            font-size: 40px;
+            height: 60px;
+            width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .sparkle-fx {
+            position: absolute;
+            font-size: 24px;
+            animation: floatSparkle 0.8s ease-out infinite alternate;
+            opacity: 0;
         }
 
         .hp-bar-container {
             display: flex;
             justify-content: space-between;
             gap: 15px;
-            margin: 15px 0;
+            margin: 10px 0;
         }
 
-        .hp-bar-wrapper { flex: 1; }
+        .hp-bar-wrapper { flex: 1; text-align: left; font-size: 12px; font-weight: bold; }
         .hp-bar {
-            height: 20px;
-            background: #333;
-            border-radius: 10px;
+            height: 22px;
+            background: #2A2D3E;
+            border-radius: 11px;
             overflow: hidden;
-            position: relative;
+            margin-top: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .hp-fill { height: 100%; transition: width 0.3s ease; }
-        .hp-fill-blue { background: var(--accent-blue); width: 100%; }
-        .hp-fill-red { background: var(--accent-red); width: 100%; }
+        .hp-fill { height: 100%; transition: width 0.4s ease-in-out; }
+        .hp-fill-blue { background: linear-gradient(90deg, #2B7FFF, #00D2FF); width: 100%; }
+        .hp-fill-red { background: linear-gradient(90deg, #FF4757, #FF6B81); width: 100%; }
 
         .battle-log {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: bold;
-            height: 30px;
+            min-height: 25px;
             color: var(--warning);
+            margin-top: 10px;
         }
 
         .winner-banner {
-            font-size: 22px;
-            font-weight: bold;
-            margin-top: 10px;
+            font-size: 24px;
+            font-weight: 900;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            letter-spacing: 1px;
             animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
         }
 
+        .winner-blue { background: linear-gradient(45deg, #1E90FF, #2B7FFF); color: white; border: 3px solid #70A1FF; }
+        .winner-red { background: linear-gradient(45deg, #FF4757, #D63031); color: white; border: 3px solid #FF7675; }
+
+        /* Animations */
         @keyframes popIn {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
+        @keyframes floatSparkle {
+            0% { transform: translateY(0) scale(0.8); opacity: 0.2; }
+            100% { transform: translateY(-15px) scale(1.3); opacity: 1; }
         }
 
-        .shaking { animation: shake 0.3s ease-in-out infinite; }
+        @keyframes moveBlueToCenter {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(80px); }
+            100% { transform: translateX(60px); }
+        }
+
+        @keyframes moveRedToCenter {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-80px); }
+            100% { transform: translateX(-60px); }
+        }
+
+        .anim-blue-attack { animation: moveBlueToCenter 1.2s ease-in-out infinite alternate; }
+        .anim-red-attack { animation: moveRedToCenter 1.2s ease-in-out infinite alternate; }
+
+        .ko-brawler { filter: grayscale(100%); opacity: 0.3; transform: scale(0.8); }
+        .victory-brawler { transform: scale(1.2); filter: drop-shadow(0 0 8px #FFD700); }
     </style>
 </head>
 <body>
@@ -194,22 +270,22 @@
             <h2>1. Set Model Weights</h2>
             
             <div class="control-group">
-                <label>Brawler Trophies (T<sub>i</sub>) Weight: <span id="w-trophy-val">1.0</span></label>
+                <label><span>Brawler Trophies (T<sub>i</sub>) Weight:</span><span id="w-trophy-val">1.0</span></label>
                 <input type="range" id="w-trophy" min="0" max="2" step="0.1" value="1.0">
             </div>
 
             <div class="control-group">
-                <label>Power Level (PL) Weight: <span id="w-power-val">0.5</span></label>
+                <label><span>Power Level (PL) Weight:</span><span id="w-power-val">0.5</span></label>
                 <input type="range" id="w-power" min="0" max="2" step="0.1" value="0.5">
             </div>
 
             <div class="control-group">
-                <label>Win/Loss Streak Weight: <span id="w-streak-val">0.2</span></label>
+                <label><span>Win/Loss Streak Weight:</span><span id="w-streak-val">0.2</span></label>
                 <input type="range" id="w-streak" min="0" max="2" step="0.1" value="0.2">
             </div>
 
             <div class="control-group">
-                <label>Ping / Latency Penalty Weight: <span id="w-ping-val">0.5</span></label>
+                <label><span>Ping / Latency Penalty Weight:</span><span id="w-ping-val">0.5</span></label>
                 <input type="range" id="w-ping" min="0" max="2" step="0.1" value="0.5">
             </div>
 
@@ -265,20 +341,46 @@
 
         <button class="btn btn-battle" onclick="startBattle()">⚔️ Start Battle Simulation!</button>
 
-        <!-- BATTLE ANIMATION ARENA -->
+        <!-- CARTOON BATTLE ANIMATION ARENA -->
         <div class="arena-box" id="arena-box">
-            <h3 id="arena-status">Battle in Progress...</h3>
+            <h3 id="arena-status">💥 BRAWL ARENA BATTLE 💥</h3>
+            
             <div class="hp-bar-container">
                 <div class="hp-bar-wrapper">
-                    <span>Blue Team HP</span>
+                    <span style="color:var(--accent-blue);">🟦 BLUE TEAM HP</span>
                     <div class="hp-bar"><div class="hp-fill hp-fill-blue" id="blue-hp"></div></div>
                 </div>
                 <div class="hp-bar-wrapper">
-                    <span>Red Team HP</span>
+                    <span style="color:var(--accent-red);">🟥 RED TEAM HP</span>
                     <div class="hp-bar"><div class="hp-fill hp-fill-red" id="red-hp"></div></div>
                 </div>
             </div>
-            <div class="battle-log" id="battle-log">Brawlers entering the arena...</div>
+
+            <div class="brawler-stage">
+                <!-- Blue Cartoon Brawlers -->
+                <div class="team-brawlers" id="blue-brawlers">
+                    <div class="brawler-avatar" title="Brawler 1">🤖</div>
+                    <div class="brawler-avatar" title="Brawler 2">🦁</div>
+                    <div class="brawler-avatar" title="Brawler 3">🐱</div>
+                </div>
+
+                <!-- Center Clash Sparkles -->
+                <div class="clash-center" id="clash-center">
+                    <span id="clash-icon">⚔️</span>
+                    <span class="sparkle-fx" id="sp1" style="top:-10px; left:-10px;">✨</span>
+                    <span class="sparkle-fx" id="sp2" style="bottom:-5px; right:-10px;">⚡</span>
+                    <span class="sparkle-fx" id="sp3" style="top:-15px; right:5px;">🎆</span>
+                </div>
+
+                <!-- Red Cartoon Brawlers -->
+                <div class="team-brawlers" id="red-brawlers">
+                    <div class="brawler-avatar" title="Brawler 4">🤠</div>
+                    <div class="brawler-avatar" title="Brawler 5">🌵</div>
+                    <div class="brawler-avatar" title="Brawler 6">🏴‍☠️</div>
+                </div>
+            </div>
+
+            <div class="battle-log" id="battle-log">Ready to brawl!</div>
             <div id="winner-banner"></div>
         </div>
     </div>
@@ -287,7 +389,6 @@
 <script>
     let currentMatchData = null;
 
-    // Update Slider Value Displays
     document.querySelectorAll('input[type="range"]').forEach(input => {
         input.addEventListener('input', (e) => {
             document.getElementById(`${e.target.id}-val`).innerText = e.target.value;
@@ -437,64 +538,91 @@
         document.getElementById('blue-hp').style.width = '100%';
         document.getElementById('red-hp').style.width = '100%';
         document.getElementById('winner-banner').innerHTML = '';
-        document.getElementById('team-card').classList.remove('shaking');
+        document.getElementById('winner-banner').className = '';
+        
+        document.getElementById('blue-brawlers').classList.remove('anim-blue-attack');
+        document.getElementById('red-brawlers').classList.remove('anim-red-attack');
+
+        document.querySelectorAll('.brawler-avatar').forEach(avatar => {
+            avatar.classList.remove('ko-brawler', 'victory-brawler');
+        });
+
+        document.querySelectorAll('.sparkle-fx').forEach(sp => sp.style.opacity = '0');
     }
 
     function startBattle() {
         if (!currentMatchData) return;
 
+        resetArena();
         const arena = document.getElementById('arena-box');
-        const teamCard = document.getElementById('team-card');
         const blueHp = document.getElementById('blue-hp');
         const redHp = document.getElementById('red-hp');
         const log = document.getElementById('battle-log');
         const banner = document.getElementById('winner-banner');
+        const blueBrawlers = document.getElementById('blue-brawlers');
+        const redBrawlers = document.getElementById('red-brawlers');
+        const clashIcon = document.getElementById('clash-icon');
 
         arena.style.display = 'block';
-        banner.innerHTML = '';
-        blueHp.style.width = '100%';
-        redHp.style.width = '100%';
 
-        // Calculate Win Probability based on Group Skill (GS)
+        // Win Probability based on Group Skill
         const gs1 = Math.max(currentMatchData.gs1, 50);
         const gs2 = Math.max(currentMatchData.gs2, 50);
         const blueWinProb = gs1 / (gs1 + gs2);
         const blueWins = Math.random() < blueWinProb;
 
-        teamCard.classList.add('shaking');
+        // Step 1: Charge into battle
+        log.innerText = "🚀 Brawlers charging into the arena!";
+        blueBrawlers.classList.add('anim-blue-attack');
+        redBrawlers.classList.add('anim-red-attack');
 
-        // Battle Animation Sequence
-        log.innerText = "💥 Brawlers charging Supers...";
-        
+        // Step 2: Clash with Sparkles & FX
         setTimeout(() => {
-            log.innerText = "⚔️ Heavy crossfire in Gem Grab mine!";
-            blueHp.style.width = blueWins ? '65%' : '40%';
-            redHp.style.width = blueWins ? '40%' : '65%';
+            log.innerText = "💥 CLASH! Brawlers firing Supers and gadgets!";
+            clashIcon.innerText = "💥";
+            document.querySelectorAll('.sparkle-fx').forEach(sp => sp.style.opacity = '1');
+            blueHp.style.width = blueWins ? '70%' : '35%';
+            redHp.style.width = blueWins ? '35%' : '70%';
         }, 1000);
 
+        // Step 3: Overtime
         setTimeout(() => {
-            log.innerText = "💣 Overtime activated! Final clash!";
-            blueHp.style.width = blueWins ? '35%' : '10%';
-            redHp.style.width = blueWins ? '10%' : '35%';
-        }, 2000);
+            log.innerText = "⚡ OVERTIME! High tension in Gem Grab!";
+            clashIcon.innerText = "💣";
+            blueHp.style.width = blueWins ? '45%' : '15%';
+            redHp.style.width = blueWins ? '15%' : '45%';
+        }, 2200);
 
+        // Step 4: Final Winner Reveal
         setTimeout(() => {
-            teamCard.classList.remove('shaking');
+            blueBrawlers.classList.remove('anim-blue-attack');
+            redBrawlers.classList.remove('anim-red-attack');
+            document.querySelectorAll('.sparkle-fx').forEach(sp => sp.style.opacity = '0');
+
             if (blueWins) {
-                blueHp.style.width = '25%';
+                blueHp.style.width = '30%';
                 redHp.style.width = '0%';
-                log.innerText = "🏆 Team Red KO'd!";
-                banner.innerHTML = `<div class="winner-banner" style="color: var(--accent-blue);">🎉 BLUE TEAM VICTORY!</div>`;
+                clashIcon.innerText = "🏆";
+                log.innerText = "🎉 Red Team KO'd! Blue Team wins!";
+                banner.className = "winner-banner winner-blue";
+                banner.innerHTML = "🏆 BLUE TEAM VICTORY! 🏆<br><span style='font-size:14px; font-weight:normal;'>Blue Team had higher overall model skill!</span>";
+
+                document.querySelectorAll('#blue-brawlers .brawler-avatar').forEach(a => a.classList.add('victory-brawler'));
+                document.querySelectorAll('#red-brawlers .brawler-avatar').forEach(a => a.classList.add('ko-brawler'));
             } else {
                 blueHp.style.width = '0%';
-                redHp.style.width = '25%';
-                log.innerText = "🏆 Team Blue KO'd!";
-                banner.innerHTML = `<div class="winner-banner" style="color: var(--accent-red);">🎉 RED TEAM VICTORY!</div>`;
+                redHp.style.width = '30%';
+                clashIcon.innerText = "🏆";
+                log.innerText = "🎉 Blue Team KO'd! Red Team wins!";
+                banner.className = "winner-banner winner-red";
+                banner.innerHTML = "🏆 RED TEAM VICTORY! 🏆<br><span style='font-size:14px; font-weight:normal;'>Red Team dominated the battlefield!</span>";
+
+                document.querySelectorAll('#red-brawlers .brawler-avatar').forEach(a => a.classList.add('victory-brawler'));
+                document.querySelectorAll('#blue-brawlers .brawler-avatar').forEach(a => a.classList.add('ko-brawler'));
             }
-        }, 3000);
+        }, 3500);
     }
 
-    // Initial Run
     runSimulation();
 </script>
 
