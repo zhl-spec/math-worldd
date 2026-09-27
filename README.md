@@ -1,2 +1,364 @@
-# math-worldd
-:)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brawl Stars Matchmaking Simulator</title>
+    <style>
+        :root {
+            --bg-color: #12131C;
+            --card-bg: #1E202E;
+            --accent-blue: #2B7FFF;
+            --accent-red: #FF4757;
+            --text-main: #FFFFFF;
+            --text-sub: #A0A5BA;
+            --success: #2ED573;
+            --warning: #FFA502;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 { text-align: center; margin-bottom: 10px; }
+        p.subtitle { text-align: center; color: var(--text-sub); margin-bottom: 30px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent-blue);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #2B7FFF, #1E90FF);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.1s ease;
+        }
+
+        button:hover { transform: scale(1.02); }
+
+        .team-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .team {
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .team-blue { background: rgba(43, 127, 255, 0.15); border: 2px solid var(--accent-blue); }
+        .team-red { background: rgba(255, 71, 87, 0.15); border: 2px solid var(--accent-red); }
+
+        .player-card {
+            background: rgba(0,0,0,0.2);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .analysis-box {
+            margin-top: 20px;
+        }
+
+        .badge-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .badge-list li {
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .pro { background: rgba(46, 213, 115, 0.2); border-left: 4px solid var(--success); }
+        .con { background: rgba(255, 165, 2, 0.2); border-left: 4px solid var(--warning); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎮 Brawl Stars Matchmaking Lab</h1>
+    <p class="subtitle">Design your algorithm, generate random players, and analyze the fairness!</p>
+
+    <div class="grid">
+        <!-- CONTROLS PANEL -->
+        <div class="card">
+            <h2>1. Set Model Weights</h2>
+            
+            <div class="control-group">
+                <label>Brawler Trophies (T<sub>i</sub>) Weight: <span id="w-trophy-val">1.0</span></label>
+                <input type="range" id="w-trophy" min="0" max="2" step="0.1" value="1.0">
+            </div>
+
+            <div class="control-group">
+                <label>Power Level (PL) Weight: <span id="w-power-val">0.5</span></label>
+                <input type="range" id="w-power" min="0" max="2" step="0.1" value="0.5">
+            </div>
+
+            <div class="control-group">
+                <label>Win/Loss Streak Weight: <span id="w-streak-val">0.2</span></label>
+                <input type="range" id="w-streak" min="0" max="2" step="0.1" value="0.2">
+            </div>
+
+            <div class="control-group">
+                <label>Ping / Latency Penalty Weight: <span id="w-ping-val">0.5</span></label>
+                <input type="range" id="w-ping" min="0" max="2" step="0.1" value="0.5">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="chk-range" checked>
+                <label for="chk-range" style="font-weight:normal;">Apply Range Penalty (Prevent Weak Link Exploits)</label>
+            </div>
+
+            <button onclick="runSimulation()">Generate Lobby & Matchmake</button>
+        </div>
+
+        <!-- ANALYSIS PANEL -->
+        <div class="card">
+            <h2>2. Diagnostic Report</h2>
+            <div class="analysis-box">
+                <h3>Advantages (Pros)</h3>
+                <ul class="badge-list" id="pros-list"><li>Run the algorithm to see results.</li></ul>
+
+                <h3>Disadvantages & Flaws (Cons)</h3>
+                <ul class="badge-list" id="cons-list"><li>Run the algorithm to see results.</li></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- MATCH TEAMS DISPLAY -->
+    <div class="card" style="margin-top: 20px;">
+        <h2>3. Team Allocation (3v3)</h2>
+        <div class="team-container">
+            <div class="team team-blue">
+                <h3 style="color: var(--accent-blue);">Blue Team</h3>
+                <div id="blue-players"></div>
+                <hr>
+                <p><b>Group Skill Score (GS):</b> <span id="blue-gs">0</span></p>
+                <p><b>Avg Ping:</b> <span id="blue-ping">0</span> ms | <b>Trophy Range:</b> <span id="blue-range">0</span></p>
+            </div>
+            
+            <div class="team team-red">
+                <h3 style="color: var(--accent-red);">Red Team</h3>
+                <div id="red-players"></div>
+                <hr>
+                <p><b>Group Skill Score (GS):</b> <span id="red-gs">0</span></p>
+                <p><b>Avg Ping:</b> <span id="red-ping">0</span> ms | <b>Trophy Range:</b> <span id="red-range">0</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Update Slider Value Displays
+    document.querySelectorAll('input[type="range"]').forEach(input => {
+        input.addEventListener('input', (e) => {
+            document.getElementById(`${e.target.id}-val`).innerText = e.target.value;
+        });
+    });
+
+    // Random Player Generator
+    function generatePlayerPool() {
+        const pool = [];
+        for(let i = 1; i <= 6; i++) {
+            pool.push({
+                id: `Player ${i}`,
+                trophies: Math.floor(Math.random() * 700) + 100, // 100 - 800
+                powerLevel: Math.floor(Math.random() * 11) + 1,  // 1 - 11
+                streak: Math.floor(Math.random() * 11) - 5,      // -5 to +5
+                ping: Math.floor(Math.random() * 180) + 20       // 20ms - 200ms
+            });
+        }
+        return pool;
+    }
+
+    // Calculate individual Skill Score (S) based on student's criteria
+    function calcSkillScore(p, wTrophy, wPower, wStreak, wPing) {
+        const trophyScore = p.trophies;
+        const powerScore = p.powerLevel * 50;
+        const streakScore = p.streak * 30;
+        const pingPenalty = p.ping * 2;
+
+        return (wTrophy * trophyScore) + 
+               (wPower * powerScore) + 
+               (wStreak * streakScore) - 
+               (wPing * pingPenalty);
+    }
+
+    function runSimulation() {
+        const wTrophy = parseFloat(document.getElementById('w-trophy').value);
+        const wPower = parseFloat(document.getElementById('w-power').value);
+        const wStreak = parseFloat(document.getElementById('w-streak').value);
+        const wPing = parseFloat(document.getElementById('w-ping').value);
+        const applyRangePenalty = document.getElementById('chk-range').checked;
+
+        const players = generatePlayerPool();
+
+        // Calculate S for each player
+        players.forEach(p => {
+            p.score = calcSkillScore(p, wTrophy, wPower, wStreak, wPing);
+        });
+
+        // Find best split into 2 teams of 3
+        const combinations = [
+            [[0,1,2], [3,4,5]], [[0,1,3], [2,4,5]], [[0,1,4], [2,3,5]],
+            [[0,1,5], [2,3,4]], [[0,2,3], [1,4,5]], [[0,2,4], [1,3,5]],
+            [[0,2,5], [1,3,4]], [[0,3,4], [1,2,5]], [[0,3,5], [1,2,4]],
+            [[0,4,5], [1,2,3]]
+        ];
+
+        let bestSplit = null;
+        let minDiff = Infinity;
+
+        combinations.forEach(combo => {
+            const team1 = combo[0].map(i => players[i]);
+            const team2 = combo[1].map(i => players[i]);
+
+            const gs1 = team1.reduce((sum, p) => sum + p.score, 0);
+            const gs2 = team2.reduce((sum, p) => sum + p.score, 0);
+
+            // Range penalty calculation (Assumption 6)
+            const r1 = Math.max(...team1.map(p => p.trophies)) - Math.min(...team1.map(p => p.trophies));
+            const r2 = Math.max(...team2.map(p => p.trophies)) - Math.min(...team2.map(p => p.trophies));
+            const rangePenalty = applyRangePenalty ? Math.abs(r1 - r2) : 0;
+
+            const diff = Math.abs(gs1 - gs2) + rangePenalty;
+
+            if (diff < minDiff) {
+                minDiff = diff;
+                bestSplit = { team1, team2, gs1, gs2, r1, r2 };
+            }
+        });
+
+        renderTeams(bestSplit);
+        analyzeMatch(bestSplit, wTrophy, wPower, wStreak, wPing, applyRangePenalty);
+    }
+
+    function renderTeams(split) {
+        const renderPlayer = p => `
+            <div class="player-card">
+                <b>${p.id}</b> | 🏆 Trophies: ${p.trophies} | ⚡ Level: ${p.powerLevel}<br>
+                🔥 Streak: ${p.streak > 0 ? '+'+p.streak : p.streak} | 📶 Ping: ${p.ping}ms | <b>S Score:</b> ${Math.round(p.score)}
+            </div>`;
+
+        document.getElementById('blue-players').innerHTML = split.team1.map(renderPlayer).join('');
+        document.getElementById('red-players').innerHTML = split.team2.map(renderPlayer).join('');
+
+        document.getElementById('blue-gs').innerText = Math.round(split.gs1);
+        document.getElementById('red-gs').innerText = Math.round(split.gs2);
+
+        const avgPing1 = Math.round(split.team1.reduce((a, b) => a + b.ping, 0) / 3);
+        const avgPing2 = Math.round(split.team2.reduce((a, b) => a + b.ping, 0) / 3);
+
+        document.getElementById('blue-ping').innerText = avgPing1;
+        document.getElementById('red-ping').innerText = avgPing2;
+
+        document.getElementById('blue-range').innerText = split.r1;
+        document.getElementById('red-range').innerText = split.r2;
+    }
+
+    function analyzeMatch(split, wT, wP, wS, wPing, rangeApplied) {
+        const pros = [];
+        const cons = [];
+
+        // Analysis logic based on physical metrics vs criteria selection
+        const scoreDiff = Math.abs(split.gs1 - split.gs2);
+        if(scoreDiff < 100) {
+            pros.push("Balanced Model: Group Skill Scores are tightly matched.");
+        } else {
+            cons.push("Skill Imbalance: Significant difference in overall Group Skill Score.");
+        }
+
+        // Weak link / Carry check (Assumption 6)
+        if (!rangeApplied && (split.r1 > 350 || split.r2 > 350)) {
+            cons.push("Weak Link Exploit: One team contains a beginner carried by a high-trophy player because Range Penalty was turned off!");
+        } else if (rangeApplied) {
+            pros.push("Anti-Exploit Active: Range penalty successfully limited team skill variance.");
+        }
+
+        // Power level gap check
+        const avgPL1 = split.team1.reduce((a,b) => a + b.powerLevel, 0) / 3;
+        const avgPL2 = split.team2.reduce((a,b) => a + b.powerLevel, 0) / 3;
+        if (wP === 0 && Math.abs(avgPL1 - avgPL2) >= 3) {
+            cons.push("Gear Disadvantage: Ignoring Power Level created an unfair gear gap between teams.");
+        } else if (wP > 0) {
+            pros.push("Gear Balance: Power level differences were accounted for.");
+        }
+
+        // Ping check
+        const avgPing1 = split.team1.reduce((a,b) => a + b.ping, 0) / 3;
+        const avgPing2 = split.team2.reduce((a,b) => a + b.ping, 0) / 3;
+        if (wPing === 0 && Math.abs(avgPing1 - avgPing2) > 60) {
+            cons.push("High Latency Gap: Ignoring Ping resulted in one team suffering significant network lag.");
+        } else if (wPing > 0) {
+            pros.push("Network Optimization: Latency differences were minimized.");
+        }
+
+        // Streak check
+        if (wS === 0) {
+            cons.push("Tilt Factor: A player on a severe losing streak was placed into a high-pressure lobby.");
+        }
+
+        document.getElementById('pros-list').innerHTML = pros.map(p => `<li class="pro">✔ ${p}</li>`).join('');
+        document.getElementById('cons-list').innerHTML = cons.map(c => `<li class="con">⚠ ${c}</li>`).join('');
+    }
+
+    // Initial run
+    runSimulation();
+</script>
+
+</body>
+</html>
