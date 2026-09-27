@@ -25,18 +25,15 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1000px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         h1, h2, h3 { text-align: center; margin-bottom: 10px; }
-        p.subtitle { text-align: center; color: var(--text-sub); margin-bottom: 30px; }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+        p.subtitle { text-align: center; color: var(--text-sub); margin-bottom: 20px; }
 
         .card {
             background: var(--card-bg);
@@ -46,7 +43,13 @@
             position: relative;
         }
 
-        .control-group { margin-bottom: 15px; }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .control-group { margin-bottom: 10px; }
 
         label {
             display: flex;
@@ -65,7 +68,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 10px;
+            grid-column: span 2;
         }
 
         .btn {
@@ -82,7 +86,7 @@
             transition: transform 0.1s ease, background 0.3s ease;
         }
 
-        .btn:hover { transform: scale(1.02); }
+        .btn:hover { transform: scale(1.01); }
         .btn-battle { background: linear-gradient(45deg, #FF4757, #FF6B81); font-size: 18px; }
         .btn-reveal { background: linear-gradient(45deg, #FFA502, #ECCC68); color: #12131C; }
 
@@ -90,7 +94,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .team { border-radius: 8px; padding: 15px; }
@@ -105,10 +109,10 @@
             font-size: 13px;
         }
 
-        /* Diagnostic Hide/Reveal Styling */
+        /* Diagnostic Panel Styling */
         .report-locked {
             text-align: center;
-            padding: 30px 10px;
+            padding: 25px 10px;
             background: rgba(0,0,0,0.2);
             border-radius: 8px;
             border: 2px dashed var(--text-sub);
@@ -261,14 +265,15 @@
 <body>
 
 <div class="container">
-    <h1>🎮 Brawl Stars Matchmaking Lab</h1>
-    <p class="subtitle">Design your algorithm, test in battle, and analyze the fairness!</p>
+    <div>
+        <h1>🎮 Brawl Stars Matchmaking Lab</h1>
+        <p class="subtitle">Design your algorithm, test in battle, and analyze the fairness!</p>
+    </div>
 
-    <div class="grid">
-        <!-- CONTROLS PANEL -->
-        <div class="card">
-            <h2>1. Set Model Weights</h2>
-            
+    <!-- 1. CONTROLS PANEL -->
+    <div class="card">
+        <h2>1. Set Model Weights</h2>
+        <div class="controls-grid">
             <div class="control-group">
                 <label><span>Brawler Trophies (T<sub>i</sub>) Weight:</span><span id="w-trophy-val">1.0</span></label>
                 <input type="range" id="w-trophy" min="0" max="2" step="0.1" value="1.0">
@@ -293,34 +298,14 @@
                 <input type="checkbox" id="chk-range" checked>
                 <label for="chk-range" style="font-weight:normal;">Apply Range Penalty (Prevent Weak Links)</label>
             </div>
-
-            <button class="btn" onclick="runSimulation()">Generate Lobby & Matchmake</button>
         </div>
 
-        <!-- DIAGNOSTIC PANEL -->
-        <div class="card">
-            <h2>2. Diagnostic Report</h2>
-            
-            <div id="report-locked-view" class="report-locked">
-                <p>💡 <b>Student Challenge:</b> Look at the generated teams first! Do you think this match will be fair?</p>
-                <button class="btn btn-reveal" onclick="revealDiagnostics()">🔍 Reveal Diagnostic Report</button>
-            </div>
-
-            <div id="report-content-view" style="display: none;">
-                <h3>Advantages (Pros)</h3>
-                <ul class="badge-list" id="pros-list"></ul>
-
-                <h3>Disadvantages & Flaws (Cons)</h3>
-                <ul class="badge-list" id="cons-list"></ul>
-                
-                <button class="btn" style="background:#444;" onclick="hideDiagnostics()">🔒 Lock Report</button>
-            </div>
-        </div>
+        <button class="btn" onclick="runSimulation()">Generate Lobby & Matchmake</button>
     </div>
 
-    <!-- MATCH TEAMS DISPLAY -->
-    <div class="card" style="margin-top: 20px;" id="team-card">
-        <h2>3. Team Allocation (3v3)</h2>
+    <!-- 2. MATCH TEAMS & BATTLE ARENA DISPLAY -->
+    <div class="card" id="team-card">
+        <h2>2. Team Allocation (3v3) & Battle Arena</h2>
         <div class="team-container">
             <div class="team team-blue">
                 <h3 style="color: var(--accent-blue);">Blue Team</h3>
@@ -382,6 +367,26 @@
 
             <div class="battle-log" id="battle-log">Ready to brawl!</div>
             <div id="winner-banner"></div>
+        </div>
+    </div>
+
+    <!-- 3. DIAGNOSTIC PANEL (LOCATED AT THE VERY BOTTOM) -->
+    <div class="card">
+        <h2>3. Diagnostic Report</h2>
+        
+        <div id="report-locked-view" class="report-locked">
+            <p>💡 <b>Student Challenge:</b> Look at the generated teams and battle results! Do you think this match was fair?</p>
+            <button class="btn btn-reveal" onclick="revealDiagnostics()">🔍 Reveal Diagnostic Report</button>
+        </div>
+
+        <div id="report-content-view" style="display: none;">
+            <h3>Advantages (Pros)</h3>
+            <ul class="badge-list" id="pros-list"></ul>
+
+            <h3>Disadvantages & Flaws (Cons)</h3>
+            <ul class="badge-list" id="cons-list"></ul>
+            
+            <button class="btn" style="background:#444;" onclick="hideDiagnostics()">🔒 Lock Report</button>
         </div>
     </div>
 </div>
